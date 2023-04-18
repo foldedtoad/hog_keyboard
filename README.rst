@@ -8,7 +8,7 @@ Overview
 
 Similar to the :ref:`Peripheral <ble_peripheral>` sample, except that this
 application specifically exposes the HID GATT Service. The report map used is
-for a generic mouse.
+for a generic keyboard.
 
 In the default configuration the sample uses passkey authentication (displays a
 code on the peripheral and requires that to be entered on the host during
@@ -25,7 +25,6 @@ Requirements
 Building and Running
 ********************
 
-This sample can be found under :zephyr_file:`samples/bluetooth/peripheral_hids` in the
-Zephyr tree.
-
-See :ref:`bluetooth samples section <bluetooth-samples>` for details.
+Currently this is not fully functional.  
+There are security-related issues.
+It does work on Ubuntu 20.04.6 LTS, but fails with Android, IoS, and MacOS.
