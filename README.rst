@@ -1,6 +1,6 @@
 .. _peripheral_hids:
 
-Bluetooth: Peripheral HIDs
+Bluetooth: HID Over GATT -- HOG Keyboard
 ##########################
 
 Overview
