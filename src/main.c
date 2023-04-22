@@ -22,6 +22,7 @@
 #include <zephyr/bluetooth/gatt.h>
 
 #include "hog.h"
+#include "buttons.h"
 
 #define LOG_LEVEL 3
 #include <zephyr/logging/log.h>
@@ -167,7 +168,7 @@ void main(void)
 
 	err = bt_enable(bt_ready);
 	if (err) {
-		LOG_ERR("Bluetooth init failed: %d", err);
+		LOG_ERR("Bluetooth not ready: %d", err);
 		return;
 	}
 
@@ -176,5 +177,7 @@ void main(void)
 		LOG_INF("Bluetooth authentication callbacks registered.");
 	}
 
-	hog_button_loop();
+	buttons_init();
+
+	hog_init();
 }

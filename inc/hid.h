@@ -12,13 +12,8 @@
  * Header follows Device Class Definition for Human Interface Devices (HID)
  * Version 1.11 document (HID1_11-1.pdf).
  */
-
 #ifndef HID_H
 #define HID_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /**
  * @brief hid.h API
@@ -639,13 +634,5 @@ enum hid_kbd_led {
 	HID_KBD_LED_COMPOSE	= 0x08,
 	HID_KBD_LED_KANA	= 0x10,
 };
-
-/**
- * @}
- */
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* HID_H */

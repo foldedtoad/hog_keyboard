@@ -8,17 +8,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#ifndef HOG_H
+#define HOG_H
+
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 void hog_init(void);
-
 void hog_button_loop(void);
 
-#ifdef __cplusplus
-}
-#endif
+#endif /* HOG_H */

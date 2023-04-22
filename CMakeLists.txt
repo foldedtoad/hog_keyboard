@@ -2,9 +2,8 @@
 
 cmake_minimum_required(VERSION 3.20.0)
 
-#find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
-
 set(BOARD nrf52dk_nrf52832)
+#set(BOARD nrf51dk_nrf51422)
 
 find_package(Zephyr)
 project(hog)
