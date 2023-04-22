@@ -1,11 +1,9 @@
-/** @file
- *  @brief HoG Service sample
- */
-
 /*
- * Copyright (c) 2016 Intel Corporation
+ *  hog.c  -- HOG keyboard interface
  *
- * SPDX-License-Identifier: Apache-2.0
+ *  Copyright (c) 2023   Callender-Consulting
+ *
+ *  SPDX-License-Identifier: Apache-2.0
  */
 
 #include <zephyr/types.h>
@@ -23,7 +21,7 @@
 #include <zephyr/bluetooth/uuid.h>
 #include <zephyr/bluetooth/gatt.h>
 
-#include "hid.h"         // clone of USB hid.h
+#include "hog.h"
 #include "ascii2hid.h"
 #include "buttons.h"
 
@@ -75,13 +73,6 @@ static uint8_t ctrl_point;
  */
 static uint8_t report_map[] = HID_KEYBOARD_REPORT_DESC();
 
-
-
-typedef struct {
-    char * string;
-    int    length;
-    int    index;
-} string_desc_t;
 
 void notify_callback(struct bt_conn * conn, void *user_data);
 void hog_send_string(string_desc_t * string);
@@ -227,7 +218,7 @@ void notify_callback(struct bt_conn * conn, void *user_data)
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
-void hog_send_string(string_desc_t * string_desc) 
+void hog_send_string(string_desc_t * string_desc)
 {
     int ret;
     int keycode;

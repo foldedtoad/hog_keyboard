@@ -1,10 +1,11 @@
 /*
- * Copyright (c) 2023   Callender-Consulting
+ *  ascii2hid.c  -- HOG key code encoder
  *
- * SPDX-License-Identifier: Apache-2.0
+ *  Copyright (c) 2023   Callender-Consulting
+ *
+ *  SPDX-License-Identifier: Apache-2.0
  */
-
-#include "ascii2hid.h"
+#include "hog.h"
 
 int ascii_to_hid(uint8_t ascii)
 {

@@ -1,15 +1,15 @@
 /*
- * Copyright (c) 2023   Callender-Consulting
+ *  ascii2hid.h
  *
- * SPDX-License-Identifier: Apache-2.0
+ *  Copyright (c) 2023   Callender-Consulting
+ *
+ *  SPDX-License-Identifier: Apache-2.0
  */
 #ifndef ASCII2HID_H
 #define ASCII2HID_H
 
 #include <stdint.h>
 #include <stdbool.h>
-
-#include "hid.h"
 
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
