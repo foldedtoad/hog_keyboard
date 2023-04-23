@@ -202,16 +202,21 @@ void notify_callback(struct bt_conn * conn, void *user_data)
 {
     string_desc_t * string_desc = user_data;
 
-    LOG_INF("string_info: %p: %c, %d", 
-             string_desc,
-             string_desc->string[string_desc->index],
+#if 0
+    LOG_INF("string_info: %c, %d, %d", 
+             (string_desc->string[string_desc->index] >= 32) ? 
+              string_desc->string[string_desc->index] : '.',
+             string_desc->length,
              string_desc->index);
+#endif
 
     string_desc->index++;
 
-    if (string_desc->index <= string_desc->length) {
+    if (string_desc->string[string_desc->index] == 0)
+      return;
 
-        hog_send_string( string_desc );
+    if (string_desc->index <= string_desc->length) {
+      hog_send_string( string_desc );
     }
 }
 
@@ -243,7 +248,7 @@ void hog_send_string(string_desc_t * string_desc)
     if (needs_shift(string_desc->string[string_desc->index])) {
         report[0] |= HID_KBD_MODIFIER_RIGHT_SHIFT;
     }
-    report[7] = keycode;            
+    report[7] = keycode;
 
     params.user_data = string_desc;
 
@@ -277,8 +282,8 @@ void hog_button_event(buttons_id_t btn_id)
 
             LOG_INF("Button 1");
 
-            string_desc.string = "echo 0.123in\n";              
-            string_desc.length = (sizeof("echo 0.123in\n") + 1);                
+            string_desc.string = "echo 0.123in\n";
+            string_desc.length = sizeof("echo 0.123in\n");
             string_desc.index  = 0; 
 
             hog_send_string( &string_desc );
@@ -290,8 +295,8 @@ void hog_button_event(buttons_id_t btn_id)
 
             LOG_INF("Button 2");
 
-            string_desc.string = "echo 2.57mm\n";               
-            string_desc.length = (sizeof("echo 2.58mm\n") + 1);             
+            string_desc.string = "echo 2.57mm\n";   
+            string_desc.length = sizeof("echo 2.58mm\n");
             string_desc.index  = 0; 
 
             hog_send_string( &string_desc );
@@ -304,8 +309,8 @@ void hog_button_event(buttons_id_t btn_id)
 
             LOG_INF("Button 3");
 
-            string_desc.string = "echo Button3\n";              
-            string_desc.length = (sizeof("echo Button3\n") + 1);                
+            string_desc.string = "echo Button3\n";
+            string_desc.length = sizeof("echo Button3\n");
             string_desc.index  = 0; 
 
             hog_send_string( &string_desc );
@@ -318,9 +323,9 @@ void hog_button_event(buttons_id_t btn_id)
 
             LOG_INF("Button 4");
 
-            string_desc.string = "echo Button4\n";              
-            string_desc.length = (sizeof("echo Button4\n") + 1);                
-            string_desc.index  = 0; 
+            string_desc.string = "echo Button4\n";
+            string_desc.length = sizeof("echo Button4\n");
+            string_desc.index  = 0;
 
             hog_send_string( &string_desc );
             break;
