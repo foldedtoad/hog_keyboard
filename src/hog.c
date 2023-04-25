@@ -257,7 +257,7 @@ void hog_send_string(string_desc_t * string_desc)
      */
     ret = bt_gatt_notify_cb(NULL, &params);
     if (ret) {
-        LOG_WRN("bt_gatt_notify: ret(%d)", ret);
+        LOG_WRN("bt_gatt_notify_cb: ret(%d)", ret);
     }
 
     /*
