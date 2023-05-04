@@ -3,6 +3,7 @@
 cmake_minimum_required(VERSION 3.20.0)
 
 set(BOARD nrf52dk_nrf52832)
+#set(BOARD nrf52840dk_nrf52840)
 #set(BOARD nrf51dk_nrf51422)
 
 find_package(Zephyr)
