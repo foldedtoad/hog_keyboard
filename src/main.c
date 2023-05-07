@@ -250,22 +250,21 @@ void main(void)
         return;
     }
 
-    if (IS_ENABLED(CONFIG_SAMPLE_BT_USE_AUTHENTICATION)) {
-        bt_conn_auth_cb_register(&auth_cb_display);
-        LOG_INF("Bluetooth authentication callbacks registered.");
+    bt_conn_auth_cb_register(&auth_cb_display);
+    LOG_INF("Bluetooth authentication callbacks registered.");
 
-        err = bt_passkey_set(FIXED_PASSKEY);
-        if (err) {
-            LOG_INF("Fixed Passkey Set failed: %d", err);
-        }
-        else {
-            LOG_INF("Fixed Passkey Set to %u", FIXED_PASSKEY);
-        }
+    err = bt_passkey_set(FIXED_PASSKEY);
+    if (err) {
+        LOG_INF("Fixed Passkey Set failed: %d", err);
     }
+    else {
+        LOG_INF("Fixed Passkey Set to %u", FIXED_PASSKEY);
+    }
+
 
     buttons_init();
 
-    hog_init();
+    //hog_init();
 
     while (1) {
         /* Battery level simulation */
