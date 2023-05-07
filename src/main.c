@@ -20,6 +20,8 @@
 #include <zephyr/bluetooth/conn.h>
 #include <zephyr/bluetooth/uuid.h>
 #include <zephyr/bluetooth/gatt.h>
+#include <zephyr/bluetooth/services/bas.h> 
+#include <zephyr/bluetooth/services/dis.h> 
 
 #include "hog.h"
 #include "buttons.h"
@@ -31,33 +33,96 @@ LOG_MODULE_REGISTER(hog_kb);
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
+
+#define DEVICE_NAME     CONFIG_BT_DEVICE_NAME
+#define DEVICE_NAME_LEN (sizeof(DEVICE_NAME) - 1)
+
+#define FIXED_PASSKEY  123456U
+
 static const struct bt_data advert[] = {
-	BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
-	BT_DATA_BYTES(BT_DATA_UUID16_ALL,
-		      BT_UUID_16_ENCODE(BT_UUID_HIDS_VAL),
-		      BT_UUID_16_ENCODE(BT_UUID_BAS_VAL)),
+    BT_DATA_BYTES(BT_DATA_GAP_APPEARANCE,
+                  (CONFIG_BT_DEVICE_APPEARANCE >> 0) & 0xff,
+                  (CONFIG_BT_DEVICE_APPEARANCE >> 8) & 0xff),
+    BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
+    BT_DATA_BYTES(BT_DATA_UUID16_ALL,
+              BT_UUID_16_ENCODE(BT_UUID_HIDS_VAL),
+              BT_UUID_16_ENCODE(BT_UUID_BAS_VAL)),
 };
+
+static const struct bt_data scand[] = {
+    BT_DATA(BT_DATA_NAME_COMPLETE, DEVICE_NAME, DEVICE_NAME_LEN),
+};
+
+static const struct bt_le_adv_param *advert_param = 
+    BT_LE_ADV_PARAM(BT_LE_ADV_OPT_CONNECTABLE | BT_LE_ADV_OPT_ONE_TIME,
+                    BT_GAP_ADV_FAST_INT_MIN_2,
+                    BT_GAP_ADV_FAST_INT_MAX_2,
+                    NULL);
+
+static const char * levels[] = {
+    "L0",
+    "L1",
+    "L2",
+    "L3",
+    "L4",
+};
+
+static const char * errors[] = {
+    "SUCCESS",
+    "AUTH_FAIL",
+    "PIN_OR_KEY_MISSING",
+    "OOB_NOT_AVAILABLE",
+    "AUTH_REQUIREMENT",
+    "PAIR_NOT_SUPPORTED",
+    "PAIR_NOT_ALLOWED",
+    "INVALID_PARAM",
+    "KEY_REJECTED",
+    "UNSPECIFIED",
+};
+
+/*---------------------------------------------------------------------------*/
+/*                                                                           */
+/*---------------------------------------------------------------------------*/
+static void start_advertising(void)
+{
+    int err;
+
+    err = bt_le_adv_start(advert_param, 
+                          advert, ARRAY_SIZE(advert), 
+                          scand, ARRAY_SIZE(scand));
+    if (err) {
+        if (err == -EALREADY) {
+            LOG_INF("Advertising continued");
+        } 
+        else {
+            LOG_ERR("Start advertising failed: %d", err);
+        }
+        return;
+    }
+
+    LOG_INF("Advertising started");
+}
 
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
 static void connected(struct bt_conn *conn, uint8_t err)
 {
-	char addr[BT_ADDR_LE_STR_LEN];
+    char addr[BT_ADDR_LE_STR_LEN];
 
-	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
+    bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
 
-	if (err) {
-		LOG_ERR("Failed to connect to %s (%u)", addr, err);
-		return;
-	}
+    if (err) {
+        LOG_ERR("Failed to connect to %s (%u)", addr, err);
+        return;
+    }
 
-	LOG_INF("Connected %s", addr);
+    LOG_INF("Connected %s", addr);
 
-	int ret = bt_conn_set_security(conn, BT_SECURITY_L2);
-	if (ret) {
-		LOG_ERR("Failed to set security: %d", ret);
-	}
+    int ret = bt_conn_set_security(conn, BT_SECURITY_L2);
+    if (ret) {
+        LOG_ERR("Failed to set security: %d", ret);
+    }
 }
 
 /*---------------------------------------------------------------------------*/
@@ -65,38 +130,41 @@ static void connected(struct bt_conn *conn, uint8_t err)
 /*---------------------------------------------------------------------------*/
 static void disconnected(struct bt_conn *conn, uint8_t reason)
 {
-	char addr[BT_ADDR_LE_STR_LEN];
+    char addr[BT_ADDR_LE_STR_LEN];
 
-	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
+    bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
 
-	LOG_INF("Disconnected from %s (reason 0x%02x)", addr, reason);
+    LOG_INF("Disconnected from %s, reason %d", addr, reason);
+
+    start_advertising();
 }
 
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
 static void security_changed(struct bt_conn *conn, bt_security_t level,
-			     enum bt_security_err err)
+                 enum bt_security_err err)
 {
-	char addr[BT_ADDR_LE_STR_LEN];
+    char addr[BT_ADDR_LE_STR_LEN];
 
-	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
+    bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
 
-	if (!err) {
-		LOG_INF("Security changed: %s, level %u", addr, level);
-	} else {
-		LOG_ERR("Security failed: %s, level %u, err %d", 
-			     addr, level, err);
-	}
+    if (!err) {
+        LOG_INF("Security changed: %s, level %s", addr, levels[level]);
+    }
+    else {
+        LOG_ERR("Security failed: %s, level %s, err %s", 
+                 addr, levels[level], errors[err]);
+    }
 }
 
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
 BT_CONN_CB_DEFINE(conn_callbacks) = {
-	.connected        = connected,
-	.disconnected     = disconnected,
-	.security_changed = security_changed,
+    .connected        = connected,
+    .disconnected     = disconnected,
+    .security_changed = security_changed,
 };
 
 /*---------------------------------------------------------------------------*/
@@ -104,26 +172,20 @@ BT_CONN_CB_DEFINE(conn_callbacks) = {
 /*---------------------------------------------------------------------------*/
 static void bt_ready(int err)
 {
-	if (err) {
-		LOG_ERR("Bluetooth init failed (err %d)", err);
-		return;
-	}
+    if (err) {
+        LOG_ERR("Bluetooth init failed: %d", err);
+        return;
+    }
 
-	LOG_INF("Bluetooth initialized");
+    LOG_INF("Bluetooth initialized");
 
-	hog_init();
+    hog_init();
 
-	if (IS_ENABLED(CONFIG_SETTINGS)) {
-		settings_load();
-	}
+    if (IS_ENABLED(CONFIG_SETTINGS)) {
+        settings_load();
+    }
 
-	err = bt_le_adv_start(BT_LE_ADV_CONN_NAME, advert, ARRAY_SIZE(advert), NULL, 0);
-	if (err) {
-		LOG_ERR("Advertising fail: %d", err);
-		return;
-	}
-
-	LOG_INF("Advertising started");
+    start_advertising();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -131,11 +193,11 @@ static void bt_ready(int err)
 /*---------------------------------------------------------------------------*/
 static void auth_passkey_display(struct bt_conn *conn, unsigned int passkey)
 {
-	char addr[BT_ADDR_LE_STR_LEN];
+    char addr[BT_ADDR_LE_STR_LEN];
 
-	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
+    bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
 
-	LOG_INF("Passkey for %s: %06u", addr, passkey);
+    LOG_INF("Passkey for %s: %06u", addr, passkey);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -143,41 +205,71 @@ static void auth_passkey_display(struct bt_conn *conn, unsigned int passkey)
 /*---------------------------------------------------------------------------*/
 static void auth_cancel(struct bt_conn *conn)
 {
-	char addr[BT_ADDR_LE_STR_LEN];
+    char addr[BT_ADDR_LE_STR_LEN];
 
-	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
+    bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
 
-	LOG_WRN("Pairing cancelled: %s", addr);
+    LOG_WRN("Pairing cancelled: %s", addr);
 }
 
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
 static struct bt_conn_auth_cb auth_cb_display = {
-	.passkey_display = auth_passkey_display,
-	.passkey_entry   = NULL,
-	.cancel          = auth_cancel,
+    .passkey_display = auth_passkey_display,
+    .passkey_entry   = NULL,
+    .cancel          = auth_cancel,
 };
+
+/*---------------------------------------------------------------------------*/
+/*                                                                           */
+/*---------------------------------------------------------------------------*/
+static void bas_notify(void)
+{
+    uint8_t battery_level = bt_bas_get_battery_level();
+
+    battery_level--;
+
+    if (battery_level == 50) {
+        battery_level = 100U;
+    }
+
+    bt_bas_set_battery_level(battery_level);
+}
 
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
 void main(void)
 {
-	int err;
+    int err;
 
-	err = bt_enable(bt_ready);
-	if (err) {
-		LOG_ERR("Bluetooth not ready: %d", err);
-		return;
-	}
+    err = bt_enable(bt_ready);
+    if (err) {
+        LOG_ERR("Bluetooth not ready: %d", err);
+        return;
+    }
 
-	if (IS_ENABLED(CONFIG_SAMPLE_BT_USE_AUTHENTICATION)) {
-		bt_conn_auth_cb_register(&auth_cb_display);
-		LOG_INF("Bluetooth authentication callbacks registered.");
-	}
+    if (IS_ENABLED(CONFIG_SAMPLE_BT_USE_AUTHENTICATION)) {
+        bt_conn_auth_cb_register(&auth_cb_display);
+        LOG_INF("Bluetooth authentication callbacks registered.");
 
-	buttons_init();
+        err = bt_passkey_set(FIXED_PASSKEY);
+        if (err) {
+            LOG_INF("Fixed Passkey Set failed: %d", err);
+        }
+        else {
+            LOG_INF("Fixed Passkey Set to %u", FIXED_PASSKEY);
+        }
+    }
 
-	hog_init();
+    buttons_init();
+
+    hog_init();
+
+    while (1) {
+        /* Battery level simulation */
+        k_sleep(K_SECONDS(5));
+        bas_notify();
+    }    
 }

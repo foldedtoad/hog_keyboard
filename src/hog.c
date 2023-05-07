@@ -69,10 +69,60 @@ static uint8_t simulate_input;
 static uint8_t ctrl_point;
 
 /*
- *   User predefined keyboard mapping -- TBD trim it later.
+ *   User predefined keyboard mapping
  */
-static uint8_t report_map[] = HID_KEYBOARD_REPORT_DESC();
+#define INPUT_REP_KEYS_REF_ID            1
+#define OUTPUT_REP_KEYS_REF_ID           1
 
+static const uint8_t report_map[] = {
+    0x05, 0x01,       /* Usage Page (Generic Desktop) */
+    0x09, 0x06,       /* Usage (Keyboard) */
+    0xA1, 0x01,       /* Collection (Application) */
+
+    /* Keys */
+#if INPUT_REP_KEYS_REF_ID
+    0x85, INPUT_REP_KEYS_REF_ID,
+#endif
+    0x05, 0x07,       /* Usage Page (Key Codes) */
+    0x19, 0xe0,       /* Usage Minimum (224) */
+    0x29, 0xe7,       /* Usage Maximum (231) */
+    0x15, 0x00,       /* Logical Minimum (0) */
+    0x25, 0x01,       /* Logical Maximum (1) */
+    0x75, 0x01,       /* Report Size (1) */
+    0x95, 0x08,       /* Report Count (8) */
+    0x81, 0x02,       /* Input (Data, Variable, Absolute) */
+
+    0x95, 0x01,       /* Report Count (1) */
+    0x75, 0x08,       /* Report Size (8) */
+    0x81, 0x01,       /* Input (Constant) reserved byte(1) */
+
+    0x95, 0x06,       /* Report Count (6) */
+    0x75, 0x08,       /* Report Size (8) */
+    0x15, 0x00,       /* Logical Minimum (0) */
+    0x25, 0x65,       /* Logical Maximum (101) */
+    0x05, 0x07,       /* Usage Page (Key codes) */
+    0x19, 0x00,       /* Usage Minimum (0) */
+    0x29, 0x65,       /* Usage Maximum (101) */
+    0x81, 0x00,       /* Input (Data, Array) Key array(6 bytes) */
+
+    /* LED */
+#if OUTPUT_REP_KEYS_REF_ID
+    0x85, OUTPUT_REP_KEYS_REF_ID,
+#endif
+    0x95, 0x05,       /* Report Count (5) */
+    0x75, 0x01,       /* Report Size (1) */
+    0x05, 0x08,       /* Usage Page (Page# for LEDs) */
+    0x19, 0x01,       /* Usage Minimum (1) */
+    0x29, 0x05,       /* Usage Maximum (5) */
+    0x91, 0x02,       /* Output (Data, Variable, Absolute), */
+    /* Led report */
+    0x95, 0x01,       /* Report Count (1) */
+    0x75, 0x03,       /* Report Size (3) */
+    0x91, 0x01,       /* Output (Data, Variable, Absolute), */
+    /* Led report padding */
+
+    0xC0              /* End Collection (Application) */
+  };
 
 void notify_callback(struct bt_conn * conn, void *user_data);
 void hog_send_string(string_desc_t * string);
@@ -163,22 +213,27 @@ static ssize_t write_ctrl_point(struct bt_conn *conn,
 /* HID Service Declaration */
 BT_GATT_SERVICE_DEFINE(hog_svc,
     BT_GATT_PRIMARY_SERVICE(BT_UUID_HIDS),
-    BT_GATT_CHARACTERISTIC(BT_UUID_HIDS_INFO, BT_GATT_CHRC_READ,
-                   BT_GATT_PERM_READ, read_info, NULL, &info),
-    BT_GATT_CHARACTERISTIC(BT_UUID_HIDS_REPORT_MAP, BT_GATT_CHRC_READ,
-                   BT_GATT_PERM_READ, read_report_map, NULL, NULL),
+    BT_GATT_CHARACTERISTIC(BT_UUID_HIDS_INFO,
+                           BT_GATT_CHRC_READ,
+                           BT_GATT_PERM_READ, 
+                           read_info, NULL, &info),
+    BT_GATT_CHARACTERISTIC(BT_UUID_HIDS_REPORT_MAP,
+                           BT_GATT_CHRC_READ,
+                           BT_GATT_PERM_READ, 
+                           read_report_map, NULL, NULL),
     BT_GATT_CHARACTERISTIC(BT_UUID_HIDS_REPORT,
-                   BT_GATT_CHRC_READ | BT_GATT_CHRC_NOTIFY,
-                   SAMPLE_BT_PERM_READ,
-                   read_input_report, NULL, NULL),
+                           BT_GATT_CHRC_READ | BT_GATT_CHRC_NOTIFY,
+                           SAMPLE_BT_PERM_READ,
+                           read_input_report, NULL, NULL),
     BT_GATT_CCC(input_ccc_changed,
-            SAMPLE_BT_PERM_READ | SAMPLE_BT_PERM_WRITE),
-    BT_GATT_DESCRIPTOR(BT_UUID_HIDS_REPORT_REF, BT_GATT_PERM_READ,
-               read_report, NULL, &input),
+                           SAMPLE_BT_PERM_READ | SAMPLE_BT_PERM_WRITE),
+    BT_GATT_DESCRIPTOR(BT_UUID_HIDS_REPORT_REF, 
+                           BT_GATT_PERM_READ,
+                           read_report, NULL, &input),
     BT_GATT_CHARACTERISTIC(BT_UUID_HIDS_CTRL_POINT,
-                   BT_GATT_CHRC_WRITE_WITHOUT_RESP,
-                   BT_GATT_PERM_WRITE,
-                   NULL, write_ctrl_point, &ctrl_point),
+                           BT_GATT_CHRC_WRITE_WITHOUT_RESP,
+                           BT_GATT_PERM_WRITE,
+                           NULL, write_ctrl_point, &ctrl_point),
 );
 
 /*---------------------------------------------------------------------------*/
@@ -248,7 +303,7 @@ void hog_send_string(string_desc_t * string_desc)
     if (needs_shift(string_desc->string[string_desc->index])) {
         report[0] |= HID_KBD_MODIFIER_RIGHT_SHIFT;
     }
-    report[7] = keycode;
+    report[2] = keycode;
 
     params.user_data = string_desc;
 
