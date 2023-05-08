@@ -7,7 +7,7 @@ set(BOARD nrf52dk_nrf52832)
 #set(BOARD nrf51dk_nrf51422)
 
 find_package(Zephyr)
-project(hog)
+project(hog_keyboard)
 
 include_directories(app PRIVATE inc)
 
