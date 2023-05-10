@@ -28,7 +28,7 @@
 
 #define LOG_LEVEL 3
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(hog_kb);
+LOG_MODULE_REGISTER(hog_main);
 
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
@@ -153,8 +153,8 @@ static void security_changed(struct bt_conn *conn, bt_security_t level,
         LOG_INF("Security changed: %s, level %s", addr, levels[level]);
     }
     else {
-        LOG_ERR("Security failed: %s, level %s, err %s", 
-                 addr, levels[level], errors[err]);
+        LOG_ERR("Security failed: %s, level %s, err (%d) %s", 
+                 addr, levels[level], err, errors[err]);
     }
 }
 
@@ -191,18 +191,6 @@ static void bt_ready(int err)
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
-static void auth_passkey_display(struct bt_conn *conn, unsigned int passkey)
-{
-    char addr[BT_ADDR_LE_STR_LEN];
-
-    bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
-
-    LOG_INF("Passkey for %s: %06u", addr, passkey);
-}
-
-/*---------------------------------------------------------------------------*/
-/*                                                                           */
-/*---------------------------------------------------------------------------*/
 static void auth_cancel(struct bt_conn *conn)
 {
     char addr[BT_ADDR_LE_STR_LEN];
@@ -215,10 +203,54 @@ static void auth_cancel(struct bt_conn *conn)
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
+static void auth_pairing_confirm(struct bt_conn *conn)
+{
+    char addr[BT_ADDR_LE_STR_LEN];
+
+    bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
+
+    bt_conn_auth_pairing_confirm(conn);
+
+    LOG_INF("Pairing confirm: %s", addr);
+}
+
+#if 0
+/*---------------------------------------------------------------------------*/
+/*                                                                           */
+/*---------------------------------------------------------------------------*/
+static void auth_passkey_display(struct bt_conn *conn, unsigned int passkey)
+{
+    char addr[BT_ADDR_LE_STR_LEN];
+
+    bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
+
+    LOG_INF("Passkey for %s: %06u", addr, passkey);
+}
+#endif
+
+#if 0
+/*---------------------------------------------------------------------------*/
+/*                                                                           */
+/*---------------------------------------------------------------------------*/
+static void auth_passkey_confirm(struct bt_conn *conn, unsigned int passkey)
+{
+    char addr[BT_ADDR_LE_STR_LEN];
+
+    bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
+
+    LOG_WRN("Pairing passkey confirm: %s: %d", addr, passkey);
+}
+#endif
+
+/*---------------------------------------------------------------------------*/
+/*                                                                           */
+/*---------------------------------------------------------------------------*/
 static struct bt_conn_auth_cb auth_cb_display = {
-    .passkey_display = auth_passkey_display,
+    .pairing_confirm = auth_pairing_confirm,
     .passkey_entry   = NULL,
     .cancel          = auth_cancel,
+//    .passkey_display = auth_passkey_display,
+//    .passkey_confirm = auth_passkey_confirm,    
 };
 
 /*---------------------------------------------------------------------------*/
@@ -253,6 +285,7 @@ void main(void)
     bt_conn_auth_cb_register(&auth_cb_display);
     LOG_INF("Bluetooth authentication callbacks registered.");
 
+#if defined(CONFIG_BT_FIXED_PASSKEY)
     err = bt_passkey_set(FIXED_PASSKEY);
     if (err) {
         LOG_INF("Fixed Passkey Set failed: %d", err);
@@ -260,7 +293,7 @@ void main(void)
     else {
         LOG_INF("Fixed Passkey Set to %u", FIXED_PASSKEY);
     }
-
+#endif    
 
     buttons_init();
 
