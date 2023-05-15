@@ -2,10 +2,10 @@
 
 ## Overview
 Similar to the :ref:`Peripheral <ble_peripheral>` sample, except that this
-application specifically exposes the HID GATT Service. The report map used is
-for a generic keyboard.
+application specifically exposes the HID GATT Service.  
+The report map used is for a generic keyboard.
 
-The target systems are Linux (Ubuntu), iOS, Android, Windows (10/11), MacOS.  
+The target systems are Linux/Ubuntu, iOS, Android, Windows, MacOS.  
 All except MacOS have been successfully tested as keyboards.  
 MacOS is giving strange indications, which have yet to be resolved.
 The other platforms accept keyboard input per expectations.
@@ -13,10 +13,22 @@ The other platforms accept keyboard input per expectations.
 There is an unresolved issue of disconnecting and reconnecting.  
 For Ubuntu 22.04 LTS, disconnecting and reconnecting hit bonding issues.
 
-## Building and Running
+## Development
+HOG Keyboard uses the Nordic nRF52832-DK board (PCA10040).  
+The firmware was developed on Zephyr RTOS V3.3.99 on Ubuntu 22.04.2.
+
+
+## Development Status
 Currently this is not fully functional.  
 There are security-related issues (bonding).  
-It does work on Ubuntu 22.04.6 LTS, Android, IoS, and windows, but fails with MacOS.  
+
+
+Hog_keyboard currently tested with the following platforms s
+* Ubuntu 22.04.2 -- works
+* Android 6.0.1 -- works
+* IOS 16.4.1 -- works
+* Windows-11 -- works
+* MacOS 13.1  -- fails  
 
 ``` 
 *** Booting Zephyr OS build zephyr-v3.3.0-1787-g286f10323ce1 ***
