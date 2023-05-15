@@ -64,13 +64,16 @@ user@ubuntu:~$ echo 0.123in
 ## HOG Keyboard Conneced and Input
   
   
-Below shows HOG Keyboard connected to Ubuntu.
+Below shows HOG Keyboard connected to Ubuntu.  
+  
 ![here](https://github.com/foldedtoad/hog_keyboard/blob/master/images/ubuntu-hog.png)
    
  
   
 Below shows HOG Keyboard conneccted to Windows11.  
+  
 ![here](https://github.com/foldedtoad/hog_keyboard/blob/master/images/Window11_hog_kb.png)
 
 Below shows HOG Keyboard input to IOS Notes app. 
+  
 ![here](https://github.com/foldedtoad/hog_keyboard/blob/master/images/IOS_Notes.png)
