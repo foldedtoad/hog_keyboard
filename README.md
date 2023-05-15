@@ -1,11 +1,6 @@
-.. _peripheral_hids:
+# Bluetooth: HID Over GATT -- HOG Keyboard
 
-Bluetooth: HID Over GATT -- HOG Keyboard
-##########################
-
-Overview
-********
-
+## Overview
 Similar to the :ref:`Peripheral <ble_peripheral>` sample, except that this
 application specifically exposes the HID GATT Service. The report map used is
 for a generic keyboard.
@@ -18,9 +13,7 @@ The other platforms accept keyboard input per expectations.
 There is an unresolved issue of disconnecting and reconnecting.  
 For Ubuntu 22.04 LTS, disconnecting and reconnecting hit bonding issues.
 
-Building and Running
-********************
-
+## Building and Running
 Currently this is not fully functional.  
 There are security-related issues (bonding).  
 It does work on Ubuntu 22.04.6 LTS, Android, IoS, and windows, but fails with MacOS.  
@@ -49,7 +42,7 @@ It does work on Ubuntu 22.04.6 LTS, Android, IoS, and windows, but fails with Ma
 [00:03:55.160,858] <inf> hog: hog_button_event: Button 1
 ```
   
-The result of pressing button 1 and viewed from shell terminal is shown below
+The result of pressing button 1 and viewed from a Ubuntu shell terminal is shown below
 
 ```  
 user@ubuntu:~$ echo 0.123in
