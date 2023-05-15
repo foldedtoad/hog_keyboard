@@ -16,14 +16,14 @@ MacOS is giving strange indications, which have yet to be resolved.
 The other platforms accept keyboard input per expectations.
 
 There is an unresolved issue of disconnecting and reconnecting.  
-For Ubuntu V22.04 LTS, disconnecting and reconnecting hit bonding issues.
+For Ubuntu 22.04 LTS, disconnecting and reconnecting hit bonding issues.
 
 Building and Running
 ********************
 
 Currently this is not fully functional.  
-There are security-related issues (bonding).
-It does work on Ubuntu 22.04.6 LTS, Android, IoS, and windows, but fails with MacOS.
+There are security-related issues (bonding).  
+It does work on Ubuntu 22.04.6 LTS, Android, IoS, and windows, but fails with MacOS.  
 
 ``` 
 *** Booting Zephyr OS build zephyr-v3.3.0-1787-g286f10323ce1 ***
@@ -47,13 +47,15 @@ It does work on Ubuntu 22.04.6 LTS, Android, IoS, and windows, but fails with Ma
 [00:00:31.011,596] <inf> hog_kb: connected: Connected 00:1A:7D:DA:71:13 (public)
 [00:00:31.703,308] <inf> hog_kb: security_changed: Security changed: 00:1A:7D:DA:71:13 (public), level 2
 [00:03:55.160,858] <inf> hog: hog_button_event: Button 1
-``` 
-
+```
+  
 The result of pressing button 1 and viewed from shell terminal is shown below
 
 ```  
 user@ubuntu:~$ echo 0.123in
 0.123in
 ```
+  
+![here](https://github.com/foldedtoad/hog_keyboard/blob/master/images/ubuntu-hog.png)
 
 
