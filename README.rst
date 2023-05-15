@@ -10,24 +10,20 @@ Similar to the :ref:`Peripheral <ble_peripheral>` sample, except that this
 application specifically exposes the HID GATT Service. The report map used is
 for a generic keyboard.
 
-In the default configuration the sample uses passkey authentication (displays a
-code on the peripheral and requires that to be entered on the host during
-pairing) and requires an authenticated link to access the GATT characteristics.
-To disable authentication and just use encrypted channels instead, build the
-sample with `CONFIG_SAMPLE_BT_USE_AUTHENTICATION=n`.
+The target systems are Linux (Ubuntu), iOS, Android, Windows (10/11), MacOS.  
+All except MacOS have been successfully tested as keyboards.  
+MacOS is giving strange indications, which have yet to be resolved.
+The other platforms accept keyboard input per expectations.
 
-Requirements
-************
-
-* BlueZ running on the host, or
-* A board with BLE support
+There is an unresolved issue of disconnecting and reconnecting.  
+For Ubuntu V22.04 LTS, disconnecting and reconnecting hit bonding issues.
 
 Building and Running
 ********************
 
 Currently this is not fully functional.  
-There are security-related issues.
-It does work on Ubuntu 20.04.6 LTS, but fails with Android, IoS, and MacOS.
+There are security-related issues (bonding).
+It does work on Ubuntu 22.04.6 LTS, Android, IoS, and windows, but fails with MacOS.
 
 ``` 
 *** Booting Zephyr OS build zephyr-v3.3.0-1787-g286f10323ce1 ***
