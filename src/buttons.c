@@ -12,7 +12,7 @@
 
 #define LOG_LEVEL 3
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(buttons);
+LOG_MODULE_REGISTER(hog_buttons);
 
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
@@ -124,7 +124,7 @@ void buttons_unregister_notify_handler(void)
 /*---------------------------------------------------------------------------*/
 void buttons_init(void)
 {
-    LOG_INF("");
+    LOG_INF("buttons_init");
 
     gpiob = DEVICE_DT_GET(SW_GPIO_DEV);
     if (!gpiob) {

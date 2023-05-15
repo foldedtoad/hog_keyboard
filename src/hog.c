@@ -27,7 +27,7 @@
 
 #define LOG_LEVEL 3
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(hog);
+LOG_MODULE_REGISTER(hog_keyboard);
 
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
@@ -397,7 +397,7 @@ void hog_button_event(buttons_id_t btn_id)
 /*---------------------------------------------------------------------------*/
 void hog_init(void)
 {
-    LOG_INF("");
+    LOG_INF("hog init");
 
     buttons_register_notify_handler(hog_button_event);
 }
