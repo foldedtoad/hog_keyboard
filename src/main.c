@@ -214,43 +214,13 @@ static void auth_pairing_confirm(struct bt_conn *conn)
     LOG_INF("Pairing confirm: %s", addr);
 }
 
-#if 0
-/*---------------------------------------------------------------------------*/
-/*                                                                           */
-/*---------------------------------------------------------------------------*/
-static void auth_passkey_display(struct bt_conn *conn, unsigned int passkey)
-{
-    char addr[BT_ADDR_LE_STR_LEN];
-
-    bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
-
-    LOG_INF("Passkey for %s: %06u", addr, passkey);
-}
-#endif
-
-#if 0
-/*---------------------------------------------------------------------------*/
-/*                                                                           */
-/*---------------------------------------------------------------------------*/
-static void auth_passkey_confirm(struct bt_conn *conn, unsigned int passkey)
-{
-    char addr[BT_ADDR_LE_STR_LEN];
-
-    bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
-
-    LOG_WRN("Pairing passkey confirm: %s: %d", addr, passkey);
-}
-#endif
-
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
 static struct bt_conn_auth_cb auth_cb_display = {
     .pairing_confirm = auth_pairing_confirm,
     .passkey_entry   = NULL,
-    .cancel          = auth_cancel,
-//    .passkey_display = auth_passkey_display,
-//    .passkey_confirm = auth_passkey_confirm,    
+    .cancel          = auth_cancel,   
 };
 
 /*---------------------------------------------------------------------------*/
@@ -296,8 +266,6 @@ void main(void)
 #endif    
 
     buttons_init();
-
-    //hog_init();
 
     while (1) {
         /* Battery level simulation */

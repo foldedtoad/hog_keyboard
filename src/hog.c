@@ -14,6 +14,7 @@
 #include <zephyr/sys/printk.h>
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/kernel.h>
+#include <zephyr/drivers/sensor.h>
 
 #include <zephyr/bluetooth/bluetooth.h>
 #include <zephyr/bluetooth/hci.h>
@@ -24,6 +25,7 @@
 #include "hog.h"
 #include "ascii2hid.h"
 #include "buttons.h"
+#include "temp.h"
 
 #define LOG_LEVEL 3
 #include <zephyr/logging/log.h>
@@ -364,8 +366,11 @@ void hog_button_event(buttons_id_t btn_id)
 
             LOG_INF("Button 3");
 
-            string_desc.string = "echo Button3\n";
-            string_desc.length = sizeof("echo Button3\n");
+            static char temp_string[24];
+            temp_read(temp_string);
+
+            string_desc.string = temp_string;
+            string_desc.length = strlen(temp_string);
             string_desc.index  = 0; 
 
             hog_send_string( &string_desc );
@@ -398,6 +403,8 @@ void hog_button_event(buttons_id_t btn_id)
 void hog_init(void)
 {
     LOG_INF("hog init");
+
+    temp_init();
 
     buttons_register_notify_handler(hog_button_event);
 }
